@@ -1,4 +1,4 @@
-# ViralVision 🎥📈
+# ViralVision 
 
 ViralVision is a machine learning project that predicts whether a YouTube video will be **Low**, **Medium**, or **Viral** based on:
 
