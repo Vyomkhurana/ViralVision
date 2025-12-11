@@ -14,7 +14,6 @@ ViralVision is a machine learning project that predicts whether a YouTube video 
 - Pandas, NumPy
 - Scikit-learn
 - NLTK
-- Streamlit
 
 ## Project Structure
 
