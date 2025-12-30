@@ -50,19 +50,19 @@ def fetch_trending_videos(max_results=50, region_code="US"):
 
         video_info = {
             "video_id": video_id,
-            "title": snippet.get("title", ""),                         # video title
-            "description": snippet.get("description", ""),             # video description
-            "channel_title": snippet.get("channelTitle", ""),          # channel name
-            "published_at": snippet.get("publishedAt", ""),            # upload time (ISO format)
-            "tags": "|".join(snippet.get("tags", [])),                 # tags list → single string separated by |
-            "category_id": snippet.get("categoryId", ""),              # YouTube category ID
+            "title": snippet.get("title", ""),                     
+            "description": snippet.get("description", ""),          
+            "channel_title": snippet.get("channelTitle", ""),        
+            "published_at": snippet.get("publishedAt", ""),           
+            "tags": "|".join(snippet.get("tags", [])),                 
+            "category_id": snippet.get("categoryId", ""),              
 
             "view_count": stats.get("viewCount", 0),
             "like_count": stats.get("likeCount", 0),
             "comment_count": stats.get("commentCount", 0),
 
-            "duration": content_details.get("duration", ""),           # ISO 8601 duration like 'PT15M33S'
-            "definition": content_details.get("definition", "")        # 'hd' or 'sd'
+            "duration": content_details.get("duration", ""),           
+            "definition": content_details.get("definition", "")    
         }
 
         videos_data.append(video_info)
