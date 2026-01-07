@@ -16,16 +16,30 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 
 df = pd.read_csv("data/processed/labeled_videos.csv")
 
-# Select input features (X)
+# Select input features (X) - Now with 7 NEW features!
 X = df[
     [
+        # Original 5 features:
         "title_length",
         "description_length",
         "tag_count",
         "like_ratio",
         "comment_ratio",
+        # New 7 features for better predictions:
+        "title_word_count",
+        "title_uppercase_ratio",
+        "title_has_question",
+        "title_has_exclamation",
+        "day_of_week",
+        "hour_of_day",
+        "is_weekend",
     ]
 ]
+
+print(f"\n📊 Training with {len(X.columns)} features:")
+for i, feat in enumerate(X.columns, 1):
+    print(f"   {i}. {feat}")
+print()
 
 # Select output label (y)
 y = df["virality_label"]
