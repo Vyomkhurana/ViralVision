@@ -1,5 +1,7 @@
 # Import pandas to load CSV data
 import pandas as pd
+import pickle
+import os
 
 # Import LabelEncoder to convert text labels into numbers
 from sklearn.preprocessing import LabelEncoder
@@ -159,3 +161,29 @@ print("   - Which features the model relies on most")
 print("   - Higher = more influential in predictions")
 
 print("\n✅ Model training and evaluation complete!")
+
+# ==========================================
+# STEP 4: SAVE MODEL AND ENCODER
+# ==========================================
+
+print("\n💾 Saving model and label encoder...")
+
+# Create models directory if it doesn't exist
+os.makedirs("models", exist_ok=True)
+
+# Save the trained model
+with open("models/virality_model.pkl", "wb") as f:
+    pickle.dump(model, f)
+
+# Save the label encoder to decode predictions later
+with open("models/label_encoder.pkl", "wb") as f:
+    pickle.dump(label_encoder, f)
+
+# Save feature names for prediction script
+with open("models/feature_names.pkl", "wb") as f:
+    pickle.dump(list(X.columns), f)
+
+print("✅ Model saved to models/virality_model.pkl")
+print("✅ Label encoder saved to models/label_encoder.pkl")
+print("✅ Feature names saved to models/feature_names.pkl")
+print("\n🎉 Ready for predictions!")
