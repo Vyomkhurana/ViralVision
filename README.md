@@ -216,6 +216,5 @@ MIT License - feel free to use for your projects!
 
 ---
 
-**Made with ❤️ by [Your Name]**
 
 For questions or feedback, open an issue on GitHub!
