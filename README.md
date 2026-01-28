@@ -52,7 +52,7 @@ ViralVision/
 
 ## 🚀 Quick Start
 
-### 1. Clone & Install
+### 1️⃣ Clone & Install
 
 ```bash
 git clone <your-repo-url>
@@ -60,7 +60,7 @@ cd ViralVision
 pip install -r requirements.txt
 ```
 
-### 2. Set Up YouTube API
+### 2️⃣ Set Up YouTube API
 
 Create a `.env` file in the project root:
 
@@ -68,9 +68,9 @@ Create a `.env` file in the project root:
 YOUTUBE_API_KEY=your_api_key_here
 ```
 
-[Get your API key here](https://console.cloud.google.com/apis/credentials)
+💡 💡 [Get your API key here](https://console.cloud.google.com/apis/credentials)
 
-### 3. Run the Pipeline
+### 3️⃣ Run the Pipeline
 
 ```bash
 # Step 1: Collect data from YouTube
@@ -92,7 +92,7 @@ python src/model_training_advanced.py
 python src/visualize_data.py
 ```
 
-### 4. Launch Web App
+### 4️⃣ Launch Web App
 
 ```bash
 streamlit run app/streamlit_app.py
