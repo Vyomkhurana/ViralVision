@@ -180,8 +180,11 @@ def main():
         
         # Predict button
         if st.button("🚀 Predict Virality", type="primary", use_container_width=True):
+            # basic validation before running the prediction
             if not title:
                 st.warning("⚠️ Please enter a video title!")
+            elif len(title.strip()) < 5:
+                st.warning("⚠️ Title seems too short. Try a more descriptive title!")
             else:
                 with st.spinner("🔮 Analyzing your video..."):
                     # Combine date and time
