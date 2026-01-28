@@ -93,11 +93,13 @@ def extract_features(video_data):
         features["day_of_week"] = published_dt.dayofweek
         features["hour_of_day"] = published_dt.hour
         features["is_weekend"] = 1 if published_dt.dayofweek >= 5 else 0
-    except:
-        # Default values if date parsing fails
-        features["day_of_week"] = 0
-        features["hour_of_day"] = 12
-        features["is_weekend"] = 0
+    except Exception as e:
+        # fallback to current time if date parsing fails - better than hardcoded defaults
+        print(f"⚠️  Warning: Could not parse date, using current time: {e}")
+        now = datetime.now()
+        features["day_of_week"] = now.weekday()
+        features["hour_of_day"] = now.hour
+        features["is_weekend"] = 1 if now.weekday() >= 5 else 0
     
     return features
 
