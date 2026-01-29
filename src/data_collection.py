@@ -12,7 +12,7 @@ API_KEY=os.getenv("YOUTUBE_API_KEY")
 
 #safety check if no api key found#
 if API_KEY is None:
-    raise ValueError("YOUTUBE_API_KEY not found. ")
+    raise ValueError("YOUTUBE_API_KEY not found.")
 
 #func for youtube client creation#
 
@@ -78,17 +78,24 @@ def save_to_csv(videos_data, filename):
         print("No data to save.")
         return  
 
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    # Create directory only if filename contains a directory path
+    dir_name = os.path.dirname(filename)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
 
     fieldnames = list(videos_data[0].keys())
 
-    with open(filename, mode="w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+    try:
+        with open(filename, mode="w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
 
-        writer.writeheader()     
-        writer.writerows(videos_data)  
+            writer.writeheader()     
+            writer.writerows(videos_data)  
 
-    print(f"Saved {len(videos_data)} videos to {filename}")
+        print(f"Saved {len(videos_data)} videos to {filename}")
+    except IOError as e:
+        print(f"Error saving CSV file: {e}")
+        raise
 
 
 #main execution block#

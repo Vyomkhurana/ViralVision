@@ -3,15 +3,18 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-# laod raw data #
+# load raw data #
 
 RAW_DATA_DIR = "data/raw"
 
 #get csv files from raw folder#
 
-raw_files = sorted(
-    [f for f in os.listdir(RAW_DATA_DIR) if f.endswith(".csv")]
-)
+try:
+    raw_files = sorted(
+        [f for f in os.listdir(RAW_DATA_DIR) if f.endswith(".csv")]
+    )
+except FileNotFoundError:
+    raise FileNotFoundError(f"Directory not found: {RAW_DATA_DIR}")
 
 if not raw_files:
     raise FileNotFoundError("No raw CSV files found in data/raw")
@@ -22,7 +25,10 @@ raw_path = os.path.join(RAW_DATA_DIR, latest_file)
 
 print(f"Loading data from: {raw_path}")
 
-df = pd.read_csv(raw_path)
+try:
+    df = pd.read_csv(raw_path)
+except Exception as e:
+    raise Exception(f"Error reading CSV file: {e}")
 
 #  INITIAL INSPECTIOn #
 
