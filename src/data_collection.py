@@ -1,33 +1,64 @@
-# importing from other modules#
+"""Data collection module for ViralVision.
+
+Fetches trending videos from YouTube API and saves to CSV.
+"""
+
 import os 
 import csv
+import logging
+from typing import List, Dict, Any, Optional
 from datetime import datetime
 
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
 
+from config import DEFAULT_MAX_RESULTS, DEFAULT_REGION_CODE, LOG_FORMAT, LOG_LEVEL
+
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL),
+    format=LOG_FORMAT
+)
+logger = logging.getLogger(__name__)
+
 #api key #
 load_dotenv()
-API_KEY=os.getenv("YOUTUBE_API_KEY")
+API_KEY: Optional[str] = os.getenv("YOUTUBE_API_KEY")
 
 #safety check if no api key found#
 if API_KEY is None:
-    raise ValueError("YOUTUBE_API_KEY not found.")
+    logger.error("YOUTUBE_API_KEY not found in environment variables")
+    raise ValueError("YOUTUBE_API_KEY not found. Please set it in .env file")
+
+logger.info("YouTube API key loaded successfully")
 
 #func for youtube client creation#
 
-def get_youtube_client():
-    youtube=build(
+def get_youtube_client() -> Any:
+    """Create and return YouTube API client.
+    
+    Returns:
+        YouTube API client object
+    """
+    youtube = build(
         "youtube",
         "v3",
         developerKey=API_KEY
     )
-
     return youtube
 
 #fetching trending videos#
 
-def fetch_trending_videos(max_results=50, region_code="US"):
+def fetch_trending_videos(max_results: int = DEFAULT_MAX_RESULTS, region_code: str = DEFAULT_REGION_CODE) -> List[Dict[str, Any]]:
+    """Fetch trending videos from YouTube.
+    
+    Args:
+        max_results: Maximum number of videos to fetch
+        region_code: Region code for trending videos
+        
+    Returns:
+        List of video data dictionaries
+    """
    
     youtube = get_youtube_client()
 

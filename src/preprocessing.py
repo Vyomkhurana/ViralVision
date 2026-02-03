@@ -1,11 +1,26 @@
+"""Data preprocessing module for ViralVision.
+
+This module handles loading, cleaning, and feature engineering for video data.
+"""
+
 import os
+import logging
+from typing import Optional
 import pandas as pd
 import numpy as np
 from datetime import datetime
 
-# load raw data #
+from config import (
+    RAW_DATA_DIR, PROCESSED_DATA_DIR, PROCESSED_VIDEOS_FILE,
+    NUMERIC_COLUMNS, LOG_FORMAT, LOG_LEVEL
+)
 
-RAW_DATA_DIR = "data/raw"
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL),
+    format=LOG_FORMAT
+)
+logger = logging.getLogger(__name__)
 
 #get csv files from raw folder#
 
@@ -22,31 +37,24 @@ if not raw_files:
 latest_file = raw_files[-1]
 raw_path = os.path.join(RAW_DATA_DIR, latest_file)
 
-
-print(f"Loading data from: {raw_path}")
+logger.info(f"Loading data from: {raw_path}")
 
 try:
     df = pd.read_csv(raw_path)
 except Exception as e:
+    logger.error(f"Error reading CSV file: {e}")
     raise Exception(f"Error reading CSV file: {e}")
 
-#  INITIAL INSPECTIOn #
+#  INITIAL INSPECTION #
 
-print("\nShape of data (rows, columns):")
-print(df.shape)
-
-print("\nColumn names:")
-print(df.columns)
-
-print("\nFirst 5 rows:")
-print(df.head())
+logger.info(f"Shape of data (rows, columns): {df.shape}")
+logger.info(f"Column names: {list(df.columns)}")
+logger.debug(f"First 5 rows:\n{df.head()}")
 
 # basic cleaning #
 # convert numeric column from string to numeric (yt data)#
 
-numeric_columns = ["view_count", "like_count", "comment_count"]
-
-for col in numeric_columns:
+for col in NUMERIC_COLUMNS:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
 
@@ -111,14 +119,13 @@ df["hour_of_day"] = df["published_datetime"].dt.hour
 # Is weekend? (Saturday or Sunday)
 df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
 
-print(f"\n✨ Added 7 new features:")
-print("   - title_word_count")
-print("   - title_uppercase_ratio")
-print("   - title_has_question")
-print("   - title_has_exclamation")
-print("   - day_of_week")
-print("   - hour_of_day")
-print("   - is_weekend")
+logger.info("✨ Added 7 new features:")
+features = [
+    "title_word_count", "title_uppercase_ratio", "title_has_question",
+    "title_has_exclamation", "day_of_week", "hour_of_day", "is_weekend"
+]
+for feature in features:
+    logger.info(f"   - {feature}")
 
 
 # engagement matrics #
@@ -131,10 +138,13 @@ df["comment_ratio"] = df["comment_count"] / df["view_count"]
 
 # save processed data #
 
-PROCESSED_DIR = "data/processed"
-os.makedirs(PROCESSED_DIR, exist_ok=True)
+os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 
-output_path = os.path.join(PROCESSED_DIR, "processed_videos.csv")
-df.to_csv(output_path, index=False)
-
-print(f"\nProcessed data saved to: {output_path}")
+output_path = os.path.join(PROCESSED_DATA_DIR, PROCESSED_VIDEOS_FILE)
+try:
+    df.to_csv(output_path, index=False)
+    logger.info(f"Processed data saved to: {output_path}")
+    logger.info(f"Total rows processed: {len(df)}")
+except Exception as e:
+    logger.error(f"Failed to save processed data: {e}")
+    raise
