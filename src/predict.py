@@ -7,6 +7,7 @@ import pickle
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from typing import Tuple, Dict
 
 
 def load_model_artifacts():
@@ -26,6 +27,32 @@ def load_model_artifacts():
         print("❌ Error: Model files not found!")
         print("Please train the model first by running: python src/model_training.py")
         raise e
+
+
+def get_prediction_confidence(model, features_df) -> Tuple[str, float, Dict[str, float]]:
+    """
+    Get prediction with confidence scores for all classes
+    
+    Parameters:
+    -----------
+    model : trained model
+        The trained classifier
+    features_df : pd.DataFrame
+        Feature dataframe
+    
+    Returns:
+    --------
+    tuple : (prediction, max_confidence, all_probabilities)
+    """
+    probabilities = model.predict_proba(features_df)[0]
+    prediction_idx = np.argmax(probabilities)
+    max_confidence = probabilities[prediction_idx]
+    
+    # Map probabilities to class names
+    class_names = ['Low', 'Medium', 'Viral']  # Adjust based on your classes
+    prob_dict = {class_names[i]: float(probabilities[i]) for i in range(len(probabilities))}
+    
+    return model.classes_[prediction_idx], max_confidence, prob_dict
 
 
 def extract_features(video_data):

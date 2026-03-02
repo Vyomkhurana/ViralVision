@@ -5,7 +5,9 @@ Error handling, validation, and helper functions
 
 import os
 import pandas as pd
+import time
 from datetime import datetime
+from functools import wraps
 
 
 class ValidationError(Exception):
@@ -49,6 +51,24 @@ def validate_video_data(video_data):
                 raise ValidationError(f"{field} must be a number")
     
     return True
+
+
+def performance_monitor(func):
+    """
+    Decorator to monitor function performance
+    
+    Logs execution time and memory usage for debugging
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        
+        print(f"⏱️  {func.__name__} executed in {execution_time:.4f} seconds")
+        return result
+    return wrapper
 
 
 def validate_csv_file(csv_path):

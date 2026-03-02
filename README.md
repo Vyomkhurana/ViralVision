@@ -6,6 +6,7 @@ ViralVision uses machine learning to predict whether a YouTube video will be **L
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Status: Active](https://img.shields.io/badge/Status-Active-success.svg)](https://github.com)
 
 ## ✨ Features
 

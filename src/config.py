@@ -65,3 +65,21 @@ MEDIUM_THRESHOLD = 100_000
 # Logging configuration
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 LOG_LEVEL = "INFO"
+
+# Prediction settings
+MIN_CONFIDENCE_THRESHOLD = 0.6
+ENABLE_PREDICTION_CACHE = True
+CACHE_TTL_SECONDS = 3600
+
+# Performance settings
+MAX_BATCH_SIZE = 1000
+ENABLE_PERFORMANCE_LOGGING = True
+
+# Prediction settings
+MIN_CONFIDENCE_THRESHOLD = 0.6
+ENABLE_PREDICTION_CACHE = True
+CACHE_TTL_SECONDS = 3600
+
+# Performance settings
+MAX_BATCH_SIZE = 1000
+ENABLE_PERFORMANCE_LOGGING = True
