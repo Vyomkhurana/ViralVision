@@ -22,8 +22,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#get csv files from raw folder#
-
+# Get CSV files from raw data folder
 try:
     raw_files = sorted(
         [f for f in os.listdir(RAW_DATA_DIR) if f.endswith(".csv")]
@@ -45,24 +44,21 @@ except Exception as e:
     logger.error(f"Error reading CSV file: {e}")
     raise Exception(f"Error reading CSV file: {e}")
 
-#  INITIAL INSPECTION #
-
+# Initial data inspection
 logger.info(f"Shape of data (rows, columns): {df.shape}")
 logger.info(f"Column names: {list(df.columns)}")
 logger.debug(f"First 5 rows:\n{df.head()}")
 
-# basic cleaning #
-# convert numeric column from string to numeric (yt data)#
+# Basic data cleaning
+# Convert numeric columns from string to numeric (YouTube data)
 
 for col in NUMERIC_COLUMNS:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
-
-# Remove rows with missing essential values#
-
+# Remove rows with missing essential values
 df.dropna(subset=["view_count"], inplace=True)
 
-#feature engineering#
+# Feature engineering
 
 # Title length
 df["title_length"] = df["title"].astype(str).apply(len)
@@ -119,7 +115,7 @@ df["hour_of_day"] = df["published_datetime"].dt.hour
 # Is weekend? (Saturday or Sunday)
 df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
 
-logger.info("✨ Added 7 new features:")
+logger.info("Added 7 new features:")
 features = [
     "title_word_count", "title_uppercase_ratio", "title_has_question",
     "title_has_exclamation", "day_of_week", "hour_of_day", "is_weekend"
@@ -127,8 +123,7 @@ features = [
 for feature in features:
     logger.info(f"   - {feature}")
 
-
-# engagement matrics #
+# Engagement metrics
 
 # Like ratio 
 df["like_ratio"] = df["like_count"] / df["view_count"]
@@ -136,8 +131,7 @@ df["like_ratio"] = df["like_count"] / df["view_count"]
 # Comment ratio
 df["comment_ratio"] = df["comment_count"] / df["view_count"]
 
-# save processed data #
-
+# Save processed data
 os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
 
 output_path = os.path.join(PROCESSED_DATA_DIR, PROCESSED_VIDEOS_FILE)
