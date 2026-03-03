@@ -1,4 +1,4 @@
-# 🎬 ViralVision 
+# ViralVision 
 
 **AI-Powered YouTube Video Virality Predictor**
 
@@ -9,19 +9,19 @@ ViralVision uses machine learning to predict whether a YouTube video will be **L
 [![Status: Production](https://img.shields.io/badge/Status-Production-success.svg)](https://github.com)
 [![Updated: March 2026](https://img.shields.io/badge/Updated-March%202026-blue.svg)](https://github.com)
 
-## ✨ Features
+## Features
 
-- 🎯 **Accurate Predictions**: ML model with 12+ engineered features (80-85% accuracy)
-- 📊 **Interactive Dashboard**: Beautiful Streamlit web interface with 3 main tabs
-- 🔍 **Batch Processing**: Predict multiple videos from CSV with downloadable results
-- 📈 **Data Visualizations**: 10+ chart types including heatmaps and distributions
-- ⚡ **Hyperparameter Tuning**: GridSearchCV optimization across 32+ configurations
-- 🛠️ **Production Ready**: Complete error handling, validation, and model persistence
-- 🔐 **Input Validation**: Custom validation utilities with detailed error messages
-- 💾 **Model Management**: Automatic save/load with versioned backups
-- 📝 **Title Analysis**: Quality scoring system for video titles
+- **Accurate Predictions**: ML model with 12+ engineered features (80-85% accuracy)
+- **Interactive Dashboard**: Beautiful Streamlit web interface with 3 main tabs
+- **Batch Processing**: Predict multiple videos from CSV with downloadable results
+- **Data Visualizations**: 10+ chart types including heatmaps and distributions
+- **Hyperparameter Tuning**: GridSearchCV optimization across 32+ configurations
+- **Production Ready**: Complete error handling, validation, and model persistence
+- **Input Validation**: Custom validation utilities with detailed error messages
+- **Model Management**: Automatic save/load with versioned backups
+- **Title Analysis**: Quality scoring system for video titles
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Python 3.8+**
 - **YouTube Data API v3** - Data collection
@@ -31,7 +31,7 @@ ViralVision uses machine learning to predict whether a YouTube video will be **L
 - **Matplotlib & Seaborn** - Visualizations
 - **Plotly** - Interactive charts
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 ViralVision/
@@ -65,11 +65,11 @@ ViralVision/
 └── ROADMAP.md                       # Future features & roadmap
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-> 📘 For detailed setup instructions, see [QUICKSTART.md](QUICKSTART.md)
+> For detailed setup instructions, see [QUICKSTART.md](QUICKSTART.md)
 
-### 1️⃣ Clone & Install
+### Step 1: Clone & Install
 
 ```bash
 git clone <your-repo-url>
@@ -77,7 +77,7 @@ cd ViralVision
 pip install -r requirements.txt
 ```
 
-### 2️⃣ Set Up YouTube API
+### Step 2: Set Up YouTube API
 
 Create a `.env` file in the project root:
 
@@ -85,9 +85,9 @@ Create a `.env` file in the project root:
 YOUTUBE_API_KEY=your_api_key_here
 ```
 
-💡 [Get your API key here](https://console.cloud.google.com/apis/credentials)
+[Get your API key here](https://console.cloud.google.com/apis/credentials)
 
-### 3️⃣ Run the Pipeline
+### Step 3: Run the Pipeline
 
 ```bash
 # Step 1: Collect data from YouTube
@@ -109,7 +109,7 @@ python src/model_training_advanced.py
 python src/visualize_data.py
 ```
 
-### 4️⃣ Launch Web App
+### Step 4: Launch Web App
 
 ```bash
 streamlit run app/streamlit_app.py
@@ -117,11 +117,11 @@ streamlit run app/streamlit_app.py
 
 Visit `http://localhost:8501` to use the interactive predictor!
 
-## 🎯 Model Features
+## Model Features
 
 The model analyzes **12 key features**:
 
-### 📝 Text Features
+### Text Features
 - **title_length** - Character count in title
 - **description_length** - Character count in description
 - **tag_count** - Number of tags
@@ -130,16 +130,16 @@ The model analyzes **12 key features**:
 - **title_has_question** - Contains "?"
 - **title_has_exclamation** - Contains "!"
 
-### 💬 Engagement Features
+### Engagement Features
 - **like_ratio** - Likes per view
 - **comment_ratio** - Comments per view
 
-### ⏰ Temporal Features
+### Temporal Features
 - **day_of_week** - Publishing day (0=Mon, 6=Sun)
 - **hour_of_day** - Publishing hour (0-23)
 - **is_weekend** - Weekend upload (1=Yes, 0=No)
 
-## 📊 Usage Examples
+## Usage Examples
 
 ### Single Video Prediction
 
@@ -173,7 +173,7 @@ df = predict_batch(
 )
 ```
 
-## 📈 Model Performance
+## Model Performance
 
 After hyperparameter tuning with GridSearchCV:
 - **Accuracy**: 80-85% (varies by dataset quality and size)
@@ -183,25 +183,25 @@ After hyperparameter tuning with GridSearchCV:
 - **Training**: Tests 32+ parameter combinations for optimal performance
 - **Models Tested**: Random Forest, Gradient Boosting (best selected automatically)
 
-## 🎨 Web Interface
+## Web Interface
 
 The Streamlit app provides three comprehensive tabs:
 
-### 🎯 Tab 1: Single Video Predictor
+### Tab 1: Single Video Predictor
 - Enter video details manually or via URL
 - Instant prediction with confidence scores
 - Probability breakdown (Low/Medium/Viral percentages)
 - Feature values display
 - Real-time validation with helpful error messages
 
-### 📊 Tab 2: Batch Processor
+### Tab 2: Batch Processor
 - Upload CSV files with multiple videos
 - Bulk prediction processing
 - Downloadable results as CSV
 - Progress tracking for large batches
 - Error handling for invalid rows
 
-### 📈 Tab 3: Analytics Dashboard
+### Tab 3: Analytics Dashboard
 - Dataset statistics and distributions
 - Feature importance visualization
 - Upload timing analysis
@@ -209,9 +209,9 @@ The Streamlit app provides three comprehensive tabs:
 - Model performance metrics
 - Insights and recommendations
 
-**Launch:** `streamlit run app/streamlit_app.py` → Visit `http://localhost:8501`
+**Launch:** `streamlit run app/streamlit_app.py` -> Visit `http://localhost:8501`
 
-## 📊 Visualizations
+## Visualizations
 
 Run `python src/visualize_data.py` to generate 10+ visualizations:
 
@@ -237,7 +237,7 @@ Run `python src/visualize_data.py` to generate 10+ visualizations:
 
 All visualizations are saved to `visualizations/` directory with timestamps.
 
-## 🛠️ Advanced Features
+## Advanced Features
 
 ### Hyperparameter Tuning
 ```bash
@@ -270,7 +270,7 @@ check_model_files()  # Raises error if models missing
 - CSV format verification
 - Safe type conversions with fallbacks
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! See [ROADMAP.md](ROADMAP.md) for planned features.
 
@@ -289,18 +289,18 @@ Contributions are welcome! See [ROADMAP.md](ROADMAP.md) for planned features.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 MIT License - feel free to use for your projects!
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - YouTube Data API v3 for comprehensive video metadata
 - Scikit-learn community for excellent ML tools
 - Streamlit team for the amazing web framework
 - Open-source contributors and maintainers
 
-## 📚 Documentation
+## Documentation
 
 - **[QUICKSTART.md](QUICKSTART.md)** - Fast setup guide (5 minutes)
 - **[IMPROVEMENTS.md](IMPROVEMENTS.md)** - Detailed change log and enhancements
@@ -308,6 +308,6 @@ MIT License - feel free to use for your projects!
 
 ---
 
-**ViralVision** - Predict what goes viral before it does! 🚀
+**ViralVision** - Predict what goes viral before it does!
 
 For questions, issues, or feedback, open an issue on GitHub!
