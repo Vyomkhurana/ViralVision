@@ -1,14 +1,16 @@
 """Data preprocessing module for ViralVision.
 
 This module handles loading, cleaning, and feature engineering for video data.
+Enhanced with advanced validation and error handling.
 """
 
 import os
 import logging
-from typing import Optional
+from typing import Optional, Tuple
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import warnings
 
 from config import (
     RAW_DATA_DIR, PROCESSED_DATA_DIR, PROCESSED_VIDEOS_FILE,
@@ -21,6 +23,41 @@ logging.basicConfig(
     format=LOG_FORMAT
 )
 logger = logging.getLogger(__name__)
+
+# Suppress warnings
+warnings.filterwarnings('ignore')
+
+
+def validate_raw_data(df: pd.DataFrame) -> Tuple[bool, str]:
+    """Validate raw data for required columns and basic quality checks.
+    
+    Args:
+        df: Raw dataframe to validate
+        
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    required_columns = ['title', 'view_count', 'published_at']
+    missing_cols = [col for col in required_columns if col not in df.columns]
+    
+    if missing_cols:
+        return False, f"Missing required columns: {missing_cols}"
+    
+    if len(df) == 0:
+        return False, "Dataframe is empty"
+    
+    if df['view_count'].isna().all():
+        return False, "All view_count values are missing"
+    
+    logger.info(f"Data validation passed: {len(df)} rows, {len(df.columns)} columns")
+    return True, "Valid"
+
+
+def clean_text_field(text: str) -> str:
+    """Clean and normalize text fields."""
+    if pd.isna(text):
+        return ""
+    return str(text).strip()
 
 # Get CSV files from raw data folder
 try:

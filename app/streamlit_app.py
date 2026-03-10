@@ -11,10 +11,68 @@ import plotly.graph_objects as go
 from datetime import datetime
 import sys
 import os
+import hashlib
 
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from predict import load_model_artifacts, extract_features, predict_virality
+from model_report import ModelReportGenerator
+
+# Simple user database (in production, use proper database)
+USERS = {
+    "admin": hashlib.sha256("admin123".encode()).hexdigest(),
+    "demo": hashlib.sha256("demo123".encode()).hexdigest(),
+    "user": hashlib.sha256("password".encode()).hexdigest()
+}
+
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        username = st.session_state["username"]
+        password = st.session_state["password"]
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        if username in USERS and USERS[username] == password_hash:
+            st.session_state["password_correct"] = True
+            st.session_state["logged_in_user"] = username
+            del st.session_state["password"]  # Don't store password
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        # First run, show login form
+        st.markdown('<h1 class="main-header">🎬 ViralVision Login</h1>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Please login to continue</p>', unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.text_input("Username", key="username")
+            st.text_input("Password", type="password", key="password")
+            st.button("Login", on_click=password_entered)
+            
+            with st.expander("👤 Demo Credentials"):
+                st.info("**Username:** demo\n\n**Password:** demo123")
+        return False
+    elif not st.session_state["password_correct"]:
+        # Login failed
+        st.markdown('<h1 class="main-header">🎬 ViralVision Login</h1>', unsafe_allow_html=True)
+        st.markdown('<p class="sub-header">Please login to continue</p>', unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.text_input("Username", key="username")
+            st.text_input("Password", type="password", key="password")
+            st.button("Login", on_click=password_entered)
+            st.error("😕 Username or password incorrect")
+            
+            with st.expander("👤 Demo Credentials"):
+                st.info("**Username:** demo\n\n**Password:** demo123")
+        return False
+    else:
+        # Login successful
+        return True
 
 
 # Page configuration
@@ -117,7 +175,7 @@ def main():
             st.error("❌ Model Error")
     
     # Main content
-    tab1, tab2, tab3 = st.tabs(["🎯 Single Prediction", "📊 Batch Prediction", "📈 Analytics"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🎯 Single Prediction", "📊 Batch Prediction", "📈 Analytics", "📋 Model Reports"])
     
     # TAB 1: Single Prediction
     with tab1:
@@ -389,6 +447,163 @@ def main():
                 st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("📁 No training data found. Run the full pipeline to see analytics.")
+    
+    # TAB 4: Model Reports
+    with tab4:
+        st.header("📋 Model Performance Reports")
+        
+        st.info("""
+        Generate comprehensive performance reports for the trained model:
+        - **JSON Report**: Machine-readable metrics
+        - **Text Report**: Human-readable summary
+        - **Confusion Matrix**: Visual performance breakdown
+        - **Feature Importance**: Top contributing features
+        """)
+        
+        # Check if we have test data
+        test_data_path = "data/processed/labeled_videos.csv"
+        if os.path.exists(test_data_path):
+            df = pd.read_csv(test_data_path)
+            st.success(f"✅ Found {len(df)} videos for evaluation")
+            
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                report_name = st.text_input(
+                    "📝 Report Name",
+                    value="ViralVision Model",
+                    help="Name for your model report"
+                )
+            
+            with col2:
+                test_size = st.slider(
+                    "🎲 Test Sample Size (%)",
+                    min_value=10,
+                    max_value=50,
+                    value=20,
+                    help="Percentage of data to use for evaluation"
+                )
+            
+            if st.button("📊 Generate Full Report", type="primary", use_container_width=True):
+                with st.spinner("🔮 Generating comprehensive report..."):
+                    try:
+                        # Load model
+                        model, label_encoder, feature_names = load_model_artifacts()
+                        
+                        # Sample test data
+                        test_df = df.sample(frac=test_size/100, random_state=42)
+                        
+                        # Extract features
+                        features_list = []
+                        for _, row in test_df.iterrows():
+                            features = extract_features(row.to_dict())
+                            features_list.append(features)
+                        
+                        X = pd.DataFrame(features_list)[feature_names]
+                        y_true = label_encoder.transform(test_df["virality_label"])
+                        
+                        # Make predictions
+                        y_pred = model.predict(X)
+                        y_prob = model.predict_proba(X)
+                        
+                        # Get feature importance if available
+                        feature_importance = None
+                        if hasattr(model, 'feature_importances_'):
+                            feature_importance = dict(zip(feature_names, model.feature_importances_))
+                        
+                        # Generate report
+                        generator = ModelReportGenerator(report_name)
+                        paths = generator.generate_full_report(
+                            y_true=y_true,
+                            y_pred=y_pred,
+                            class_names=label_encoder.classes_.tolist(),
+                            y_prob=y_prob,
+                            feature_importance=feature_importance,
+                            additional_info={
+                                "test_samples": len(test_df),
+                                "feature_count": len(feature_names),
+                                "model_type": type(model).__name__
+                            }
+                        )
+                        
+                        st.success("✅ Report generated successfully!")
+                        
+                        # Display metrics
+                        st.subheader("📊 Overall Performance")
+                        metrics = generator.report_data['overall_metrics']
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("Accuracy", f"{metrics['accuracy']:.3f}")
+                        with col2:
+                            st.metric("Precision", f"{metrics['precision']:.3f}")
+                        with col3:
+                            st.metric("Recall", f"{metrics['recall']:.3f}")
+                        with col4:
+                            st.metric("F1-Score", f"{metrics['f1_score']:.3f}")
+                        
+                        # Display confusion matrix
+                        st.subheader("🎯 Confusion Matrix")
+                        if paths.get('confusion_matrix') and os.path.exists(paths['confusion_matrix']):
+                            st.image(paths['confusion_matrix'], use_container_width=True)
+                        
+                        # Display feature importance
+                        if paths.get('feature_importance') and os.path.exists(paths['feature_importance']):
+                            st.subheader("⭐ Feature Importance")
+                            st.image(paths['feature_importance'], use_container_width=True)
+                        
+                        # Download buttons
+                        st.subheader("💾 Download Reports")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            if paths.get('text') and os.path.exists(paths['text']):
+                                with open(paths['text'], 'r') as f:
+                                    text_content = f.read()
+                                st.download_button(
+                                    "📄 Download Text Report",
+                                    text_content,
+                                    file_name="model_report.txt",
+                                    mime="text/plain"
+                                )
+                        
+                        with col2:
+                            if paths.get('json') and os.path.exists(paths['json']):
+                                with open(paths['json'], 'r') as f:
+                                    json_content = f.read()
+                                st.download_button(
+                                    "📊 Download JSON Report",
+                                    json_content,
+                                    file_name="model_report.json",
+                                    mime="application/json"
+                                )
+                        
+                        # Show per-class metrics
+                        with st.expander("📈 Per-Class Metrics"):
+                            per_class = generator.report_data['per_class_metrics']
+                            metrics_df = pd.DataFrame(per_class).T
+                            st.dataframe(metrics_df.style.format("{:.3f}"))
+                        
+                        st.success("🎉 All reports saved to models/ directory")
+                        
+                    except Exception as e:
+                        st.error(f"❌ Error generating report: {str(e)}")
+                        import traceback
+                        with st.expander("🔍 Error Details"):
+                            st.code(traceback.format_exc())
+        else:
+            st.warning("⚠️ No training data found.")
+            st.info("📝 Please run the data collection and model training pipeline first.")
+            
+            with st.expander("💡 How to generate training data"):
+                st.markdown("""
+                1. Run `python src/data_collection.py` to collect YouTube data
+                2. Run `python src/preprocessing.py` to process the data
+                3. Run `python src/labeling.py` to label videos
+                4. Run `python src/model_training.py` to train the model
+                5. Return here to generate reports
+                """)
     
     # Footer
     st.markdown("---")
