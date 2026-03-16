@@ -28,6 +28,30 @@ logger = logging.getLogger(__name__)
 warnings.filterwarnings('ignore')
 
 
+def ensure_optional_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure optional text/numeric columns exist so preprocessing never crashes."""
+    optional_text_defaults = {
+        'description': '',
+        'tags': '',
+    }
+    optional_numeric_defaults = {
+        'like_count': 0,
+        'comment_count': 0,
+    }
+
+    for col, default in optional_text_defaults.items():
+        if col not in df.columns:
+            logger.warning(f"Optional column '{col}' missing. Filling with default value.")
+            df[col] = default
+
+    for col, default in optional_numeric_defaults.items():
+        if col not in df.columns:
+            logger.warning(f"Optional column '{col}' missing. Filling with default value.")
+            df[col] = default
+
+    return df
+
+
 def validate_raw_data(df: pd.DataFrame) -> Tuple[bool, str]:
     """Validate raw data for required columns and basic quality checks.
     
@@ -81,16 +105,32 @@ except Exception as e:
     logger.error(f"Error reading CSV file: {e}")
     raise Exception(f"Error reading CSV file: {e}")
 
+is_valid, validation_message = validate_raw_data(df)
+if not is_valid:
+    logger.error(f"Raw data validation failed: {validation_message}")
+    raise ValueError(validation_message)
+
 # Initial data inspection
 logger.info(f"Shape of data (rows, columns): {df.shape}")
 logger.info(f"Column names: {list(df.columns)}")
 logger.debug(f"First 5 rows:\n{df.head()}")
 
+# Ensure optional columns exist before feature engineering.
+df = ensure_optional_columns(df)
+
 # Basic data cleaning
 # Convert numeric columns from string to numeric (YouTube data)
 
 for col in NUMERIC_COLUMNS:
-    df[col] = pd.to_numeric(df[col], errors="coerce")
+    if col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    else:
+        logger.warning(f"Numeric column '{col}' missing. Filling with 0.")
+        df[col] = 0
+
+df["title"] = df["title"].apply(clean_text_field)
+df["description"] = df["description"].apply(clean_text_field)
+df["tags"] = df["tags"].apply(clean_text_field)
 
 # Remove rows with missing essential values
 df.dropna(subset=["view_count"], inplace=True)
@@ -163,10 +203,11 @@ for feature in features:
 # Engagement metrics
 
 # Like ratio 
-df["like_ratio"] = df["like_count"] / df["view_count"]
+safe_view_count = df["view_count"].replace(0, np.nan)
+df["like_ratio"] = (df["like_count"] / safe_view_count).fillna(0)
 
 # Comment ratio
-df["comment_ratio"] = df["comment_count"] / df["view_count"]
+df["comment_ratio"] = (df["comment_count"] / safe_view_count).fillna(0)
 
 # Save processed data
 os.makedirs(PROCESSED_DATA_DIR, exist_ok=True)
